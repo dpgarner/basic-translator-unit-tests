@@ -6,7 +6,7 @@ one-for-one.
 
 ## Layout
 
-```
+`72 passed``
 basic_translator/
   __init__.py          # the translator's public interface
 tests/
