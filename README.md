@@ -25,6 +25,10 @@ tests/
 pytest.ini
 ```
 
+> **Layout note:** the test files and `conftest.py` live at the repository root, not in
+> `tests/`. The recovered copy had been flattened out of that directory, so `pytest.ini`
+> points at the root instead.
+
 ## Why everything is currently `xfail`
 
 `basic_translator/__init__.py` defines the **contract** (`translate(basic_source, target) -> str`, plus
