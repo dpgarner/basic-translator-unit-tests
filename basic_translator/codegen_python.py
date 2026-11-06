@@ -227,6 +227,9 @@ def gen_stmt(s, indent: int, ctx: CodegenCtx) -> list:
             f"# ON ERROR GOTO {s.label} (approximated: error handling not translated)",
         )]
 
+    if isinstance(s, ast.End):
+        return [_line(indent, "_sys.exit(0)")]
+
     if isinstance(s, ast.Print):
         parts_code = [expr_to_py(p, ctx) for p in s.parts]
         joined = f"_basic_print({', '.join(parts_code)})" if parts_code else '""'
@@ -402,7 +405,15 @@ def generate_python(source: str, warnings=None) -> str:
         _collect_warnings(program.statements, warnings)
     array_names, callable_names = collect_symbols(program.statements)
     ctx = CodegenCtx(array_names, callable_names)
-    body_lines = gen_stmts(program.statements, 0, ctx)
+    # BASIC procedures are program-wide and may be called before their
+    # definition, so emit every SUB/FUNCTION before the main code.
+    procedures = [
+        s for s in program.statements if isinstance(s, (ast.SubDecl, ast.FunctionDecl))
+    ]
+    main_code = [
+        s for s in program.statements if not isinstance(s, (ast.SubDecl, ast.FunctionDecl))
+    ]
+    body_lines = gen_stmts(procedures, 0, ctx) + gen_stmts(main_code, 0, ctx)
     if not body_lines:
         body_lines = ["pass"]
     return RUNTIME_PRELUDE + "\n" + "\n".join(body_lines) + "\n"

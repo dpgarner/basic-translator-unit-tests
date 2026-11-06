@@ -22,6 +22,9 @@ class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
         self.pos = 0
+        # Loops still waiting to be closed by an inner NEXT that listed their
+        # variables too ("NEXT j, i").
+        self.next_extra_closures = 0
 
     # --- token helpers -----------------------------------------------------
 
@@ -127,6 +130,11 @@ class Parser:
                 category="unsupported",
                 line=tok.line,
             )
+        if tok.kind == "END":
+            # END IF / END SUB / END FUNCTION / END SELECT are consumed by their
+            # own statement parsers, so a bare END here ends the program.
+            self.advance()
+            return ast.End()
         if tok.kind == "COMMENT":
             self.advance()
             return ast.Comment(tok.value)
@@ -201,7 +209,10 @@ class Parser:
         prompt = None
         if self.check("STRING"):
             prompt = self.advance().value
-            self.expect("COMMA")
+            # QuickBASIC accepts either separator after the prompt.
+            if not (self.check("SEMI") or self.check("COMMA")):
+                self.expect("COMMA")
+            self.advance()
         targets = [self._input_target()]
         while self.check("COMMA"):
             self.advance()
@@ -327,7 +338,11 @@ class Parser:
             return ast.If(cond, then_body, elif_clauses, else_body)
         else:
             then_stmt = self.parse_statement()
-            return ast.If(cond, [then_stmt], [], None)
+            else_body = None
+            if self.check("ELSE"):
+                self.advance()
+                else_body = [self.parse_statement()]
+            return ast.If(cond, [then_stmt], [], else_body)
 
     def parse_select_case(self):
         self.expect("SELECT")
@@ -374,10 +389,24 @@ class Parser:
             self.advance()
             step = self.parse_expr()
         self.skip_separators()
-        body = self.parse_statements(until_check=lambda: self.check("NEXT"))
+        body = self.parse_statements(
+            until_check=lambda: self.check("NEXT") or self.next_extra_closures > 0
+        )
+        if self.next_extra_closures > 0:
+            # An inner NEXT listed this loop's variable too, so it is closed.
+            self.next_extra_closures -= 1
+            return ast.For(var, start, end, step, body)
         self.expect("NEXT")
+        closed = 0
         if self.check("IDENT"):
             self.advance()
+            closed = 1
+            # NEXT j, i closes several loops with one statement.
+            while self.check("COMMA"):
+                self.advance()
+                self.expect("IDENT")
+                closed += 1
+        self.next_extra_closures = closed - 1 if closed > 1 else 0
         return ast.For(var, start, end, step, body)
 
     def parse_while(self):

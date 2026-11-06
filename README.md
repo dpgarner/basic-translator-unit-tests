@@ -8,7 +8,7 @@ one-for-one.
 
 ```
 basic_translator/
-  __init__.py          # the translator's public interface (currently a stub)
+  __init__.py          # the translator's public interface
 tests/
   conftest.py           # shared fixtures: to_python(), run_python()
   test_output_print.py           <- features/output_print.feature
@@ -22,6 +22,9 @@ tests/
   test_math_functions.py         <- features/math_functions.feature
   test_error_handling_and_diagnostics.py <- features/error_handling_and_diagnostics.feature
   test_multi_target_translation.py       <- features/multi_target_translation.feature
+  test_example_programs.py               # end-to-end: examples/*.bas
+examples/
+  sales_report.bas       # realistic multi-construct program
 pytest.ini
 ```
 
@@ -32,7 +35,7 @@ pytest.ini
 ## Status
 
 `basic_translator/` holds the Python backend -- lexer, recursive-descent parser, semantic checks and the code
-generator -- taken from the `codegen` repository, so the suite runs against real behaviour: `66 passed in 2.61s`.
+generator -- taken from the `codegen` repository, so the suite runs against real behaviour: ``.
 
 The interface also covers the three scenarios that used to be skipped. `translate(..., warnings=[...])`
 collects warnings for constructs that translate but lose meaning, `translate(..., diagnostics=path)` writes a

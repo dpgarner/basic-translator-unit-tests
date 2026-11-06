@@ -72,3 +72,16 @@ def test_infinite_loop_pattern_warns_but_translates():
     )
     assert any("never ends" in w for w in warnings)
     assert "while 1:" in code  # TRUE parses to NumberLit(1), so the loop is "while 1:"
+
+
+def test_next_closes_several_loops_at_once(to_python, run_python):
+    # Scenario: Translate one NEXT listing several loop variables
+    code = to_python(
+        """
+        FOR i = 1 TO 2
+            FOR j = 1 TO 2
+                PRINT i; j
+            NEXT j, i
+        """
+    )
+    assert run_python(code).splitlines() == ["1 1", "1 2", "2 1", "2 2"]

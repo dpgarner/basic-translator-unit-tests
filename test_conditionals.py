@@ -82,3 +82,15 @@ def test_select_case_range_clause_rejected():
             target="python",
         )
     assert exc_info.value.category == "unsupported"
+
+
+def test_single_line_if_then_else(to_python, run_python):
+    # Scenario: Translate a single-line IF/THEN/ELSE
+    code = to_python(
+        """
+        DIM x AS INTEGER
+        x = 5
+        IF x > 10 THEN PRINT "big" ELSE PRINT "small"
+        """
+    )
+    assert run_python(code).strip() == "small"

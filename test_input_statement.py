@@ -45,3 +45,10 @@ def test_input_without_prompt_displays_nothing(to_python, run_python):
     code = to_python("INPUT NAME$")
     output = run_python(code, stdin_data="Bob\n")
     assert output == ""
+
+
+def test_input_prompt_accepts_semicolon_separator(to_python, run_python):
+    # Scenario: Translate INPUT with a semicolon after the prompt
+    code = to_python('INPUT "Name"; NAME$')
+    output = run_python(code, stdin_data="Alice\n")
+    assert "Name" in output

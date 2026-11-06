@@ -182,5 +182,12 @@ class OnErrorGoto(Stmt):
 
 
 @dataclass
+class End(Stmt):
+    """A bare END statement: stop the program successfully."""
+
+    trailing_comment: str | None = None
+
+
+@dataclass
 class Program:
     statements: list = field(default_factory=list)
