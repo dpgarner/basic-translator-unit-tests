@@ -4,13 +4,6 @@ import pytest
 
 from basic_translator import TranslationError, translate
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_single_line_if_then(to_python, run_python):
     # Scenario: Translate a single-line IF/THEN
     code = to_python(

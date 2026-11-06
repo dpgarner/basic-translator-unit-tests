@@ -2,13 +2,6 @@
 
 import pytest
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_fixed_size_array_declaration_defaults_to_zero(to_python, run_python):
     # Scenario: Translate a fixed-size one-dimensional array declaration
     code = to_python(

@@ -27,11 +27,6 @@ def test_recognized_but_unbuilt_targets_raise_unsupported_target_error(target):
     assert exc_info.value.target == target
 
 
-@pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
 def test_same_program_produces_equivalent_output_on_python(to_python, run_python):
     # Scenario: The same program produces equivalent observable output across all targets
     # (Python slice only until other backends exist -- add parametrized
@@ -49,11 +44,6 @@ def test_same_program_produces_equivalent_output_on_python(to_python, run_python
     assert run_python(code).strip() == "Sum: 15"
 
 
-@pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
 def test_unsupported_construct_error_category_consistent_on_python():
     # Scenario: Unsupported constructs fail the same way regardless of target
     with pytest.raises(TranslationError) as exc_info:

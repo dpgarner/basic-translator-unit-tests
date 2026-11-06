@@ -2,13 +2,6 @@
 
 import pytest
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_abs(to_python, run_python):
     code = to_python("PRINT ABS(-7)")
     assert run_python(code).strip() == "7"

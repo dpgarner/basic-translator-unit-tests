@@ -4,13 +4,6 @@ import pytest
 
 BASIC_SETUP = 'DIM s AS STRING\ns = "Hello, World!"\n'
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_len(to_python, run_python):
     code = to_python(BASIC_SETUP + "PRINT LEN(s)")
     assert run_python(code).strip() == "13"

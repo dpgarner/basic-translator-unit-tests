@@ -2,13 +2,6 @@
 
 import pytest
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_input_with_prompt_into_string_variable(to_python, run_python):
     # Scenario: Translate INPUT with a prompt into a string variable
     code = to_python('INPUT "Enter your name: ", NAME$')

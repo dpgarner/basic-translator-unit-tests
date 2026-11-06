@@ -4,13 +4,6 @@ import pytest
 
 from basic_translator import TranslationError, translate
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_syntax_error_reports_line_and_missing_then():
     # Scenario: Report a syntax error with line and column information
     with pytest.raises(TranslationError) as exc_info:

@@ -2,13 +2,6 @@
 
 import pytest
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_simple_for_next_loop(to_python, run_python):
     # Scenario: Translate a simple FOR/NEXT loop
     code = to_python(

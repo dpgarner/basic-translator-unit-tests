@@ -7,13 +7,6 @@ import pytest
 
 from basic_translator import TranslationError, translate
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_print_literal_string(to_python, run_python):
     # Scenario: Translate a literal string PRINT statement
     code = to_python('PRINT "Hello, World!"')

@@ -29,25 +29,16 @@ pytest.ini
 > `tests/`. The recovered copy had been flattened out of that directory, so `pytest.ini`
 > points at the root instead.
 
-## Why everything is currently `xfail`
+## Status
 
-`basic_translator/__init__.py` defines the **contract** (`translate(basic_source, target) -> str`, plus
-`TranslationError` / `UnsupportedTargetError`) but no real parsing or code generation yet — every Python-target
-call raises `NotImplementedError`. Tests that exercise the Python backend are marked
-`@pytest.mark.xfail(raises=NotImplementedError, strict=False)`, so:
+`basic_translator/` now carries the Python backend -- lexer, recursive-descent parser, semantic checks and the
+code generator -- taken from the `codegen` repository, so the suite runs against real behaviour rather than a
+stub: `63 passed, 3 skipped in 2.55s`.
 
-- **Today**: `pytest` runs clean (xfail, not fail) — this is the TDD "red" state, made visible instead of hidden.
-- **As you implement a piece of the backend**: the corresponding test(s) start **passing**, which pytest will
-  report as `XPASS`. Because `strict=False`, that's not a failure — but it's your signal to delete the `xfail`
-  marker for that test (or split it into its own un-marked test) once real behavior backs it.
+The three skips wait on interface additions, not missing behaviour: a warnings channel, a diagnostics-JSON
+option, and a multi-target batch-run summary. None of those exist on `translate()` yet.
 
-A few tests are **not** marked xfail and pass right now, because they test the interface's architecture rather
-than the Python backend itself — e.g. `test_multi_target_translation.py` checks that requesting an
-unimplemented target (`kotlin`, `rust`, ...) raises a clear `UnsupportedTargetError` rather than crashing.
-
-Three tests are `pytest.skip`'d with a note explaining what interface addition they're waiting on (a warnings
-channel, a diagnostics-JSON option, and a multi-target batch-run summary) — none of that surface exists on
-`translate()` yet, so there's nothing to assert against.
+The backend here and the `codegen` repository are the same code; change both, or retire one.
 
 ## Running
 

@@ -2,13 +2,6 @@
 
 import pytest
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="Python backend not implemented yet -- see basic_translator/__init__.py",
-    strict=False,
-)
-
-
 def test_function_with_return_value(to_python, run_python):
     # Scenario: Translate a FUNCTION with a return value
     code = to_python(
