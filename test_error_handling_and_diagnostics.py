@@ -1,5 +1,7 @@
 """Unit tests for features/error_handling_and_diagnostics.feature."""
 
+import json
+
 import pytest
 
 from basic_translator import TranslationError, translate
@@ -48,9 +50,13 @@ def test_undeclared_variable_reported_as_semantic_error():
     assert exc_info.value.category == "semantic"
 
 
-def test_diagnostics_json_report_generated():
+def test_diagnostics_json_report_generated(tmp_path):
     # Scenario: Produce a machine-readable diagnostics report alongside console output
-    pytest.skip(
-        "translate() does not yet accept a diagnostics-output option -- "
-        "extend the interface in basic_translator/__init__.py first"
-    )
+    out = tmp_path / "diagnostics.json"
+    warnings = []
+    translate('PRINT "hi"', target="python", warnings=warnings, diagnostics=out)
+    report = json.loads(out.read_text(encoding="utf-8"))
+    assert report["target"] == "python"
+    assert report["ok"] is True
+    assert report["warnings"] == warnings
+    assert report["error"] is None

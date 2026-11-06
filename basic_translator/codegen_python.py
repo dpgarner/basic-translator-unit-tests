@@ -358,10 +358,48 @@ def gen_stmt(s, indent: int, ctx: CodegenCtx) -> list:
     raise TranslationError(f"Unknown statement node {s!r}", category="syntax")
 
 
-def generate_python(source: str) -> str:
+def _is_true_literal(expr) -> bool:
+    """True for a condition that is literally TRUE (or 1), whatever node shape."""
+    value = getattr(expr, "value", None)
+    if value is True:
+        return True
+    if isinstance(value, str) and value.strip().upper() == "TRUE":
+        return True
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and value == 1:
+        return type(expr).__name__.lower() not in {"name", "ident", "identifier", "variable", "varname"}
+    return False
+
+
+def _iter_statements(items):
+    """Yield every statement, descending into loop and branch bodies."""
+    for item in items:
+        if isinstance(item, ast.Stmt):
+            yield item
+            for attr in ("body", "then_body", "else_body", "statements", "branches", "items", "cases"):
+                value = getattr(item, attr, None)
+                if isinstance(value, (list, tuple)):
+                    yield from _iter_statements(value)
+        elif isinstance(item, (list, tuple)):
+            yield from _iter_statements(item)
+
+
+def _collect_warnings(statements, warnings) -> None:
+    """Record constructs that translate but lose meaning."""
+    for stmt in _iter_statements(statements):
+        if isinstance(stmt, ast.OnErrorGoto):
+            warnings.append(
+                f"ON ERROR GOTO {stmt.label} is approximated: error handling is not translated"
+            )
+        elif isinstance(stmt, ast.While) and _is_true_literal(stmt.cond):
+            warnings.append("WHILE TRUE has no exit condition: the translated loop never ends")
+
+
+def generate_python(source: str, warnings=None) -> str:
     program = parse(source)
     validate_undeclared(program)
     validate_array_bounds(program)
+    if warnings is not None:
+        _collect_warnings(program.statements, warnings)
     array_names, callable_names = collect_symbols(program.statements)
     ctx = CodegenCtx(array_names, callable_names)
     body_lines = gen_stmts(program.statements, 0, ctx)

@@ -8,7 +8,13 @@ working Python backend -- so several of these can and should pass today.
 
 import pytest
 
-from basic_translator import SUPPORTED_TARGETS, TranslationError, UnsupportedTargetError, translate
+from basic_translator import (
+    SUPPORTED_TARGETS,
+    TranslationError,
+    UnsupportedTargetError,
+    translate,
+    translate_many,
+)
 
 
 def test_unknown_target_language_is_rejected():
@@ -51,11 +57,16 @@ def test_unsupported_construct_error_category_consistent_on_python():
     assert exc_info.value.category == "unsupported"
 
 
-def test_translation_run_summary_not_yet_implemented():
+def test_translation_run_summary_reports_per_target_status():
     # Scenario: A translation run reports which target languages were attempted
     # and their pass/fail status
-    pytest.skip(
-        "Batch/multi-target run summary is not yet part of the translate() "
-        "interface -- add a translate_many() or CLI entry point that reports "
-        "per-target status, then replace this skip with real assertions."
-    )
+    results = translate_many('PRINT "hi"')
+    assert [r.target for r in results] == sorted(SUPPORTED_TARGETS)
+
+    by_target = {r.target: r for r in results}
+    assert by_target["python"].ok is True
+    assert by_target["python"].output
+    assert by_target["python"].error is None
+    assert by_target["kotlin"].ok is False
+    assert "No backend" in by_target["kotlin"].error
+    assert by_target["kotlin"].category == "unsupported"

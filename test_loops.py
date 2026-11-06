@@ -2,6 +2,9 @@
 
 import pytest
 
+from basic_translator import translate
+
+
 def test_simple_for_next_loop(to_python, run_python):
     # Scenario: Translate a simple FOR/NEXT loop
     code = to_python(
@@ -57,8 +60,15 @@ def test_nested_for_loops_preserve_order(to_python, run_python):
 
 def test_infinite_loop_pattern_warns_but_translates():
     # Scenario: Detect an infinite loop pattern and warn rather than silently translate
-    # NOTE: the stub interface doesn't yet expose a warnings channel -- once
-    # translate() supports returning/raising warnings, update this test to
-    # assert a warning is emitted for "WHILE TRUE : WEND" style loops instead
-    # of just checking it doesn't crash the translator outright.
-    pytest.skip("Warnings channel not yet defined on the translate() interface")
+    warnings = []
+    code = translate(
+        """
+        WHILE TRUE
+            PRINT "still here"
+        WEND
+        """,
+        target="python",
+        warnings=warnings,
+    )
+    assert any("never ends" in w for w in warnings)
+    assert "while 1:" in code  # TRUE parses to NumberLit(1), so the loop is "while 1:"

@@ -31,12 +31,13 @@ pytest.ini
 
 ## Status
 
-`basic_translator/` now carries the Python backend -- lexer, recursive-descent parser, semantic checks and the
-code generator -- taken from the `codegen` repository, so the suite runs against real behaviour rather than a
-stub: `63 passed, 3 skipped in 2.55s`.
+`basic_translator/` holds the Python backend -- lexer, recursive-descent parser, semantic checks and the code
+generator -- taken from the `codegen` repository, so the suite runs against real behaviour: `66 passed in 2.61s`.
 
-The three skips wait on interface additions, not missing behaviour: a warnings channel, a diagnostics-JSON
-option, and a multi-target batch-run summary. None of those exist on `translate()` yet.
+The interface also covers the three scenarios that used to be skipped. `translate(..., warnings=[...])`
+collects warnings for constructs that translate but lose meaning, `translate(..., diagnostics=path)` writes a
+JSON report of the run (including on failure), and `translate_many(source)` reports per-target pass/fail
+instead of aborting on the first missing backend.
 
 The backend here and the `codegen` repository are the same code; change both, or retire one.
 
