@@ -60,3 +60,17 @@ pytest -v
 5. Once the Python backend is solid, copy this pattern for the next target language: add a `SUPPORTED_TARGETS`
    branch in `basic_translator/__init__.py`, add a `to_<language>`/`run_<language>` fixture pair to `conftest.py`,
    and parametrize the existing tests (or duplicate the test files) for that target.
+
+## Command line
+
+```
+python -m basic_translator program.bas                    # generated code on stdout
+cat program.bas | python -m basic_translator -            # source from stdin
+python -m basic_translator --out out.py program.bas       # write the code to a file
+python -m basic_translator --all-targets --diagnostics report.json program.bas
+```
+
+Exit codes: 0 when the translation succeeded, 1 on a translation error (printed to
+stderr with its category, and the `--diagnostics` report is still written), 2 on a
+usage error. `--all-targets` prints one line per language and exits 0 if any target
+worked; with `--diagnostics` the report lists every target's status.
