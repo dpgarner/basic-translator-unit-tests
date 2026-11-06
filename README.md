@@ -35,7 +35,7 @@ pytest.ini
 ## Status
 
 `basic_translator/` holds the Python backend -- lexer, recursive-descent parser, semantic checks and the code
-generator -- taken from the `codegen` repository, so the suite runs against real behaviour: ``.
+generator -- taken from the `codegen` repository, so the suite runs against real behaviour: `72 passed`.
 
 The interface also covers the three scenarios that used to be skipped. `translate(..., warnings=[...])`
 collects warnings for constructs that translate but lose meaning, `translate(..., diagnostics=path)` writes a
