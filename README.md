@@ -77,3 +77,9 @@ Exit codes: 0 when the translation succeeded, 1 on a translation error (printed 
 stderr with its category, and the `--diagnostics` report is still written), 2 on a
 usage error. `--all-targets` prints one line per language and exits 0 if any target
 worked; with `--diagnostics` the report lists every target's status.
+
+## History
+
+`docs/translator-worklog.md` records how this repository was recovered and
+extended: the decisions, the bugs a realistic program exposed, the verification
+runs and the remaining gaps.
